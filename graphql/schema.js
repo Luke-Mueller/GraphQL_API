@@ -14,9 +14,9 @@ module.exports = buildSchema(`
   type User {
     _id: ID!
     name: String!
-    email: Sting!
-    password: Sting
-    status: Sting!
+    email: String!
+    password: String
+    status: String!
     posts: [Post!]!
   }
 
@@ -26,7 +26,7 @@ module.exports = buildSchema(`
     paasword: String!
   }
 
-  type Mutation {
+  type RootMutation {
     createUser(userInput: UserInputData): User!
   }
 
