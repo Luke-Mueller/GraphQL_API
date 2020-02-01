@@ -89,8 +89,7 @@ module.exports = {
     }
     const user = await User.findById(req.userId);
     if (!user) {
-      const error = new Error('Invalid user');
-      error.data = errors;
+      const error = new Error('Invalid user')
       error.code = 401;
       throw error;
     }
@@ -120,18 +119,18 @@ module.exports = {
     }
     const totalPosts = await Post.find().countDocuments();
     const posts = await Post.find()
-      .sort({ createdAt: -1 }
-        .populate('creator'))
+      .sort({ createdAt: -1 })
+      .populate('creator');
     return {
       posts: posts.map(post => {
         return {
           ...post._doc,
-          _id: post_id.toSring(),
+          _id: post._id.toString(),
           createdAt: post.createdAt.toISOString(),
           updatedAt: post.updatedAt.toISOString()
         };
       }),
       totalPosts: totalPosts
-    }
+    };
   }
 };

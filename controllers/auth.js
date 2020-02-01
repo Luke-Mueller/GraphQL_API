@@ -18,6 +18,7 @@ exports.signup = async (req, res, next) => {
   const password = req.body.password;
   try {
     const hashedPw = await bcrypt.hash(password, 12);
+
     const user = new User({
       name: name,
       email: email,
@@ -60,7 +61,7 @@ exports.login = async (req, res, next) => {
       'secret string',
       { expiresIn: '1h' }
     );
-    res.status(200).json({ token: token, userId: loadedUser._id.toString() })
+    res.status(200).json({ token: token, userId: loadedUser._id.toString() });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -71,7 +72,7 @@ exports.login = async (req, res, next) => {
 
 exports.getUserStatus = async (req, res, next) => {
   try {
-    const user = await User.findById(req.userId)
+    const user = await User.findById(req.userId);
     if (!user) {
       const error = new Error('User not found');
       error.statusCode = 404;
@@ -96,7 +97,7 @@ exports.updateUserStatus = async (req, res, next) => {
       throw error;
     }
     user.status = newStatus;
-    const result = await user.save();
+    await user.save();
     res.status(200).json({ message: 'User updated' });
   } catch (err) {
     if (!err.statusCode) {
@@ -104,4 +105,4 @@ exports.updateUserStatus = async (req, res, next) => {
     }
     next(err);
   };
-}
+};

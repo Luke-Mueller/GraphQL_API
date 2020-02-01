@@ -54,12 +54,12 @@ exports.createPost = async (req, res, next) => {
   });
   try {
     await post.save()
-    const user = await User.findById(req.userId)
+    const user = await User.findById(req.userId);
     user.posts.push(post);
     await user.save();
     io.getIO().emit('posts', {
       action: 'create',
-      post: { ...pos._doc, creator: { _id: req.userId, name: user.name } }
+      post: { ...post._doc, creator: { _id: req.userId, name: user.name } }
     });
     res.status(201).json({
       message: 'Post created successfully!',
@@ -76,8 +76,8 @@ exports.createPost = async (req, res, next) => {
 
 exports.getPost = async (req, res, next) => {
   const postId = req.params.postId;
+  const post = await Post.findById(postId);
   try {
-    const post = await Post.findById(postId);
     if (!post) {
       const error = new Error('No post found');
       error.statusCode = 404;
@@ -117,7 +117,7 @@ exports.updatePost = async (req, res, next) => {
   }
 
   try {
-    const post = await (await Post.findById(postId)).populate('creator');
+    const post = await Post.findById(postId).populate('creator');
     if (!post) {
       const error = new Error('No post found');
       error.statusCode = 404;
@@ -149,6 +149,7 @@ exports.deletePost = async (req, res, next) => {
   const postId = req.params.postId;
   try {
     const post = await Post.findById(postId)
+
     if (!post) {
       const error = new Error('No post found');
       error.statusCode = 404;
@@ -159,14 +160,10 @@ exports.deletePost = async (req, res, next) => {
       error.statusCode = 403;
       throw error;
     }
-    if (post.creator.toString() !== req.userId) {
-      const error = new Error('Not authorized')
-      error.statusCode = 403;
-      throw error;
-    }
     // Check logged in user
     clearImage(post.imageUrl);
     await Post.findByIdAndRemove(postId);
+    
     const user = await User.findById(req.userId);
     user.posts.pull(postId);
     await user.save();
